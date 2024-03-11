@@ -13,7 +13,7 @@ const CadastroLocacoes = () => {
     const [valorMensal, setValorMensal] = useState(null);
     const [valorFicha, setValorFicha] = useState(null);
     const [clienteLocacoesVisivel, setClienteLocacoesVisivel] = useState(null);
-
+    const [valorPorcentagem, setvalorPorcentagem] = useState(null);
     // Load data from local storage
     useEffect(() => {
         const db_clientes = localStorage.getItem("cad_cliente")
@@ -50,7 +50,7 @@ const CadastroLocacoes = () => {
             cliente,
             produto,
             tipoLocacao,
-            valor: tipoLocacao === 'Mensal' ? valorMensal : valorFicha,
+            valor: tipoLocacao === 'Mensal' ? valorMensal : valorFicha, valorPorcentagem
         };
 
         const updatedLocacoes = [...locacoes, novaLocacao];
@@ -62,6 +62,7 @@ const CadastroLocacoes = () => {
         setTipoLocacao(null);
         setValorMensal(null);
         setValorFicha(null);
+        setvalorPorcentagem(null);
     };
 
     // Handle product deregistration
@@ -172,6 +173,16 @@ return (
                   />
                 </td>
               )}
+              {tipoLocacao === 'Porcentagem' && (
+                <td style={{ border: '0px solid black', padding: '10px' }}>
+                  <input
+                    type="number"
+                    value={valorPorcentagem}
+                    onChange={e => setvalorPorcentagem(e.target.value)}
+                    placeholder="Porcentagem"
+                  />
+                </td>
+              )}
             </tr>
           </table>
 
@@ -191,6 +202,7 @@ return (
                     <th>Produto</th>
                     <th>Tipo de Locação</th>
                     <th>Valor</th>
+                    <th>Porcentagem</th>
                   </tr>
                 </thead>
 
@@ -200,6 +212,7 @@ return (
                       <td>{locacao.produto.productId}</td>
                       <td>{locacao.tipoLocacao}</td>
                       <td>{locacao.valor}</td>
+                      <td>{locacao.valorPorcentagem}</td>
                       <td>
                       <Button colorScheme="red" onClick={() => {
   if(window.confirm('Tem certeza que deseja enviar este produto para o estoque?')) {

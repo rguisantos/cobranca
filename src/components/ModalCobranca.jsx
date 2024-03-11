@@ -16,7 +16,7 @@ import { useState } from "react";
 
 const ModalCobranca = ({locacao, isOpen, onClose}) => {
     const [loc, setLocacao] = useState(locacao || null);
-    const [relogioAtual, setRelogioAtual] = useState(loc.produto.counter || 0);
+    const [relogioAtual, setRelogioAtual] = useState("");
 
 
     return (
@@ -27,7 +27,7 @@ const ModalCobranca = ({locacao, isOpen, onClose}) => {
                 <ModalHeader>Cobrança</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                    <FormControl display="flex" flexDir="column" gap={4}>
+                    <FormControl display="flex" flexDir="column" gap={1}>
                     <Box>
                         <FormLabel>Cliente</FormLabel>
                         <Input
@@ -75,7 +75,7 @@ const ModalCobranca = ({locacao, isOpen, onClose}) => {
                         </Box>
                         
                         <Box>
-                        <FormLabel>Valor Cobrança</FormLabel>
+                        <FormLabel>Valor Bruto</FormLabel>
                         <Input
                         disabled="disabled"
                         readonly="readonly"
