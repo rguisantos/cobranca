@@ -16,6 +16,7 @@ import {
   TabPanels,
   Tab,
   TabPanel,
+  Collapse,
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
@@ -25,6 +26,7 @@ const AreaCobranca = () => {
   // States
   const [searchTerm, setSearchTerm] = useState(""); // New state for the search term
   const {isOpen, onOpen, onClose} = useDisclosure();
+  const [collapseId, setCollapseId] = useState(null); // New state for the collapse ID
 
   const [locacoes, setLocacoes] = useState([]);
   const [locacaoRealizarCobranca, setLocacaoCobranca] = useState(null);
@@ -36,6 +38,25 @@ const AreaCobranca = () => {
       : [];
     setLocacoes(db_locacoes);
   }, []);
+
+  // Filtrar locações
+  const locacoesFiltradas = locacoes.filter((locacao) =>
+    locacao.produto.productId.toLowerCase() === searchTerm.toLowerCase()
+    ||
+    locacao.cliente.name.toLowerCase() === searchTerm.toLowerCase()
+    ||
+    locacao.cliente.cpf.toLowerCase() === searchTerm.toLowerCase()
+  );
+
+  // Agrupar locações filtradas por cliente
+  const locacoesPorCliente = locacoesFiltradas.reduce((acc, locacao) => {
+    const clienteName = locacao.cliente.name;
+    if (!acc[clienteName]) {
+      acc[clienteName] = [];
+    }
+    acc[clienteName].push(locacao);
+    return acc;
+  }, {});
 
   return (
     <Flex
@@ -72,26 +93,28 @@ const AreaCobranca = () => {
                     </Tr>
                   </Thead>
                   <Tbody>
-                    {locacoes
-                      .filter((locacao) =>
-                        locacao.produto.productId.toLowerCase() === searchTerm.toLowerCase()
-                        ||
-                        locacao.cliente.name.toLowerCase() === searchTerm.toLowerCase()
-                        ||
-                        locacao.cliente.cpf.toLowerCase() === searchTerm.toLowerCase()
-                      )
-                      .map((locacao, index) => (
-                        <Tr key={index} cursor="pointer" _hover={{ bg: "gray.100" }}>
-                          <Td>{locacao.cliente.name}</Td>
-                          <Td>{locacao.produto.productId}</Td>
-                          <Td>{locacao.produto.type}</Td>
-                          <Td>
-                            <Button colorScheme="yellow" onClick={() => [setLocacaoCobranca(locacao), onOpen()]}>
-                              Realizar Cobrança
-                            </Button>
-                          </Td>
+                    {Object.entries(locacoesPorCliente).map(([clienteName, locacoesCliente], index) => (
+                      <React.Fragment key={index}>
+                        <Tr cursor="pointer" _hover={{ bg: "gray.100" }} onClick={() => setCollapseId(collapseId === index ? null : index)}>
+                          <Td>{clienteName}</Td>
                         </Tr>
-                      ))}
+                        <Collapse in={collapseId === index}>
+                          {locacoesCliente.map((locacao, locacaoIndex) => (
+                            <Box key={locacaoIndex} pl={5}>
+                              <Tr cursor="pointer" _hover={{ bg: "gray.100" }}>
+                                <Td>{locacao.produto.productId}</Td>
+                                <Td>{locacao.produto.type}</Td>
+                                <Td>
+                                  <Button colorScheme="yellow" onClick={() => [setLocacaoCobranca(locacao), onOpen()]}>
+                                    Realizar Cobrança
+                                  </Button>
+                                </Td>
+                              </Tr>
+                            </Box>
+                          ))}
+                        </Collapse>
+                      </React.Fragment>
+                    ))}
                   </Tbody>
                 </Table>
               </Box>
