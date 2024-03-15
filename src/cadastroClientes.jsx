@@ -11,6 +11,7 @@ import {
   useBreakpointValue,
   useDisclosure,
   Input,
+  TableContainer,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ModalComp from "./components/ModalComp";
@@ -44,25 +45,24 @@ const cadastroClientes = () => {
 
   return (
       <Flex
-        h="100vh"
-        align="auto"
-        justify="center"
+        maxWidth={isMobile ? "80%" : "100%"}
+        align="left"
+        justify="left"
         fontSize="13px"
         fontFamily="poppins"
       >
-        <Box maxW={1200} w="100%" h="100vh" py={10} px={2}>
-          <Button colorScheme="blue" onClick={() => [setDataEdit({}), onOpen()]}>
+        <Box bg="gray.100" p={1} rounded="md">
+          <TableContainer>
+          <Button m="1" colorScheme="green" onClick={() => [setDataEdit({}), onOpen()]}>
             Novo Cliente
           </Button>
-
-          <Input // New input field for the search term
+          <Input h="12" m="1" top="1" bg="gray.50" w="85%" // New input field for the search term
             placeholder="Buscar cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-
-          <Box overflowY="auto" height="100%">
-            <Table mt="2">
+          </TableContainer>
+            <Table bg="white" w="auto" p={1} rounded="md" mt="2">
               <Thead>
                 <Tr>
                   <Th fontSize="13px">Nome</Th>
@@ -77,13 +77,13 @@ const cadastroClientes = () => {
                   <Th p={0}></Th>
                 </Tr>
               </Thead>
-              <Tbody>
+              <Tbody bg="gray.50" p={2} rounded="md">
                 {data
                   .filter((client) =>
                     client.name.toLowerCase().includes(searchTerm.toLowerCase())
                   )
                   .map(({ name, cpf, rg, phone, address, neighborhood, city, state }, index) => (
-                  <Tr key={index} cursor="pointer" _hover={{ bg: "gray.100" }}>
+                  <Tr key={index} cursor="pointer" _hover={{ bg: "blue.100" }}>
                     <Td>{name}</Td>
                     <Td>{cpf}</Td>
                     <Td>{rg}</Td>
@@ -104,7 +104,6 @@ const cadastroClientes = () => {
                 ))}
               </Tbody>
               </Table>
-            </Box>
         </Box>
         {isOpen && (
           <ModalComp
