@@ -3,7 +3,7 @@ import CadastroClientes from './cadastroClientes';
 import CadastroProdutos from './cadastroProdutos';
 import CadastroLocacoes from "./cadastroLocacoes";
 import AreaCobranca from "./AreaCobranca";
-import firebase from './firebase';
+import { db } from './firebase';
 
 const App = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();

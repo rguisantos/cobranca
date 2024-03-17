@@ -14,8 +14,9 @@ import {
   TableContainer,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import ModalComp from "./components/ModalComp";
-import firebase from './firebase';
+import ModalComp from "./ModalComp";
+import { db } from './firebase';
+import { ref, onValue, set } from 'firebase/database';
 
 const cadastroClientes = () => {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -29,8 +30,8 @@ const cadastroClientes = () => {
   });
 
   useEffect(() => {
-    const db = firebase.database();
-    db.ref('cad_cliente').on('value', (snapshot) => {
+    const cadClienteRef = ref(db, 'cad_cliente');
+    onValue(cadClienteRef, (snapshot) => {
       const data = snapshot.val();
       setData(data || []);
     });
@@ -42,8 +43,8 @@ const cadastroClientes = () => {
     setData(newArray);
 
     // Update Firebase
-    const db = firebase.database();
-    await db.ref('cad_cliente').set(newArray);
+    const cadClienteRef = ref(db, 'cad_cliente');
+    await set(cadClienteRef, newArray);
   };
 
   return (

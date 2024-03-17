@@ -1,7 +1,8 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Button } from "@chakra-ui/react";
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import firebase from './firebase';
+import { db } from './firebase';
+import { ref, onValue, set } from 'firebase/database';
 
 const CadastroLocacoes = () => {
     // States
@@ -17,16 +18,18 @@ const CadastroLocacoes = () => {
     const [valorPorcentagem, setvalorPorcentagem] = useState(null);
     // Load data from Firebase
     useEffect(() => {
-        const db = firebase.database();
-        db.ref('cad_cliente').on('value', (snapshot) => {
+        const cadClienteRef = ref(db, 'cad_cliente');
+        onValue(cadClienteRef, (snapshot) => {
             const data = snapshot.val();
             setClientes(data || []);
         });
-        db.ref('cad_produto').on('value', (snapshot) => {
+        const cadProdutoRef = ref(db, 'cad_produto');
+        onValue(cadProdutoRef, (snapshot) => {
             const data = snapshot.val();
             setProdutos(data || []);
         });
-        db.ref('locacoes').on('value', (snapshot) => {
+        const locacoesRef = ref(db, 'locacoes');
+        onValue(locacoesRef, (snapshot) => {
             const data = snapshot.val();
             setLocacoes(data || []);
         });
@@ -57,8 +60,8 @@ const CadastroLocacoes = () => {
         setLocacoes(updatedLocacoes);
 
         // Update Firebase
-        const db = firebase.database();
-        await db.ref('locacoes').set(updatedLocacoes);
+        const locacoesRef = ref(db, 'locacoes');
+        await set(locacoesRef, updatedLocacoes);
 
         setClienteSelecionado(null);
         setProdutoSelecionado(null);
@@ -74,8 +77,8 @@ const CadastroLocacoes = () => {
         setLocacoes(updatedLocacoes);
 
         // Update Firebase
-        const db = firebase.database();
-        await db.ref('locacoes').set(updatedLocacoes);
+        const locacoesRef = ref(db, 'locacoes');
+        await set(locacoesRef, updatedLocacoes);
 
         const updatedProdutos = produtos.map(produto => {
             if (produto.productId === produtoId) {
@@ -85,7 +88,8 @@ const CadastroLocacoes = () => {
             }
         });
         setProdutos(updatedProdutos);
-        await db.ref('produtos').set(updatedProdutos);
+        const produtosRef = ref(db, 'produtos');
+        await set(produtosRef, updatedProdutos);
     };
 
     // Handle client click

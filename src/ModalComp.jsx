@@ -13,9 +13,10 @@ import {
     Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import firebase from './firebase';
+import { db } from './firebase';
+import { ref, set } from 'firebase/database';
 
-const ModalComp = ({data, setData, dataEdit, isOpen, onClose}) => {
+const ModalComp = ({data, setData, dataEdit = {}, isOpen, onClose}) => {
     const [name, setName] = useState(dataEdit.name ||"");
     const [cpf, setCpf] = useState(dataEdit.cpf ||"");
     const [rg, setRg] = useState(dataEdit.rg ||"");
@@ -39,8 +40,8 @@ const ModalComp = ({data, setData, dataEdit, isOpen, onClose}) => {
         : [...(data ? data : [])];
 
         // Save data to Firebase
-        const db = firebase.database();
-        await db.ref('cad_cliente').set(newDataArray);
+        const cadClienteRef = ref(db, 'cad_cliente');
+        await set(cadClienteRef, newDataArray);
 
         setData(newDataArray);
         onClose();

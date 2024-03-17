@@ -13,7 +13,7 @@ import {
     Box,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import firebase from './firebase';
+import { db } from './firebase';
 
 const ProductModal = ({data, setData, dataEdit, isOpen, onClose}) => {
     const [productId, setProductId] = useState("");
@@ -36,12 +36,15 @@ const ProductModal = ({data, setData, dataEdit, isOpen, onClose}) => {
         if (productIdAlreadyExists()) {
             return alert("Número do produto já cadastrado");
         }
+
+        let newDataArray;
         if (Object.keys(dataEdit).length) {
-            data[dataEdit.index] = { productId, type, detail, size, counter };
+            // Create a new array, update the product in this new array
+            newDataArray = [...data];
+            newDataArray[dataEdit.index] = { productId, type, detail, size, counter };
+        } else {
+            newDataArray = [...(data ? data : []), { productId, type, detail, size, counter }];
         }
-        const newDataArray = !Object.keys(dataEdit).length
-        ? [...(data ? data : []), { productId, type, detail, size, counter }]
-        : [...(data ? data : [])];
 
         // Save data to Firebase
         const db = firebase.database();

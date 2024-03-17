@@ -14,7 +14,8 @@ import {
     Checkbox,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import firebase from './firebase';
+import { db } from './firebase';
+import { ref, set } from 'firebase/database';
 
 const ModalCobranca = ({ locacao, isOpen, onClose }) => {
     const [loc, setLocacao] = useState(locacao || null);
@@ -28,8 +29,8 @@ const ModalCobranca = ({ locacao, isOpen, onClose }) => {
         // Atualize o banco de dados com o novo valor recebido, saldo devedor, relogioAtual e loc.product.counter
         try {
             // Save data to Firebase
-            const db = firebase.database();
-            await db.ref(`cobranca/${loc.id}`).set({
+            const cobrancaRef = ref(db, `cobranca/${loc.id}`);
+            await set(cobrancaRef, {
                 valorRecebido,
                 saldoDevedor,
                 relogio: relogioAtual,

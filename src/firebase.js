@@ -1,9 +1,10 @@
-import firebase from 'firebase/app';
-import 'firebase/database'; // If using Firebase database
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
     apiKey: "AIzaSyB9I6exmk-TaCRsrZZcLBKMic2oBE5S51w",
     authDomain: "cobranca-95903.firebaseapp.com",
+    databaseURL: "https://cobranca-95903-default-rtdb.firebaseio.com", // Add your database URL here
     projectId: "cobranca-95903",
     storageBucket: "cobranca-95903.appspot.com",
     messagingSenderId: "610758249942",
@@ -12,6 +13,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-export default firebase;
+export { app, db };

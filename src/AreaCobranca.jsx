@@ -20,8 +20,9 @@ import {
 } from "@chakra-ui/react";
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
-import ModalCobranca from "./components/ModalCobranca";
-import firebase from './firebase';
+import ModalCobranca from "./ModalCobranca";
+import { db } from './firebase';
+import { ref, onValue } from 'firebase/database';
 
 const AreaCobranca = () => {
   // States
@@ -34,8 +35,8 @@ const AreaCobranca = () => {
 
   // Load data from Firebase
   useEffect(() => {
-    const db = firebase.database();
-    db.ref('locacoes').on('value', (snapshot) => {
+    const locacoesRef = ref(db, 'locacoes');
+    onValue(locacoesRef, (snapshot) => {
       const data = snapshot.val();
       setLocacoes(data || []);
     });

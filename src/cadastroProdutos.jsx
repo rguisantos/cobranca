@@ -1,7 +1,8 @@
 import { Flex, Box, Button, Table, Thead, Tr, Th, Td, Tbody, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Input } from "@chakra-ui/react";
 import React, { useState, useEffect, useRef } from 'react';
 import ProductModal from './ProductModal';
-import firebase from './firebase';
+import { db } from './firebase';
+import { ref, onValue, set } from 'firebase/database';
 
 function cadastroProdutos() {
   const [products, setProducts] = useState([]);
@@ -13,8 +14,8 @@ function cadastroProdutos() {
   const cancelRef = useRef();
 
   useEffect(() => {
-    const db = firebase.database();
-    db.ref('cad_produto').on('value', (snapshot) => {
+    const cadProdutoRef = ref(db, 'cad_produto');
+    onValue(cadProdutoRef, (snapshot) => {
       const data = snapshot.val();
       setProducts(data || []);
     });
@@ -37,8 +38,8 @@ function cadastroProdutos() {
     setDeleteDialogOpen(false);
 
     // Update Firebase
-    const db = firebase.database();
-    await db.ref('cad_produto').set(newProducts);
+    const cadProdutoRef = ref(db, 'cad_produto');
+    await set(cadProdutoRef, newProducts);
   };
 
   const handleSearchChange = (event) => {
