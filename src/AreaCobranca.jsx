@@ -25,7 +25,7 @@ import ModalCobranca from "./components/ModalCobranca";
 const AreaCobranca = () => {
   // States
   const [searchTerm, setSearchTerm] = useState(""); // New state for the search term
-  const {isOpen, onOpen, onClose} = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [collapseId, setCollapseId] = useState(null); // New state for the collapse ID
 
   const [locacoes, setLocacoes] = useState([]);
@@ -61,7 +61,7 @@ const AreaCobranca = () => {
   return (
     <Flex
       h="100vh"
-      align="auto"
+      align="left"
       justify="center"
       fontSize="13px"
       fontFamily="poppins"
@@ -75,10 +75,10 @@ const AreaCobranca = () => {
           </TabList>
 
           <Input // New input field for the search term
-          placeholder="Buscar locação..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+            placeholder="Buscar locação..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
           <TabPanels>
             <TabPanel>
@@ -86,9 +86,7 @@ const AreaCobranca = () => {
                 <Table mt="2">
                   <Thead>
                     <Tr>
-                      <Th fontSize="13px">Nome</Th>
-                      <Th fontSize="13px">Produto ID</Th>
-                      <Th>Tipo</Th>
+                      <Th>Cliente</Th>
                       <Th></Th>
                     </Tr>
                   </Thead>
@@ -101,15 +99,26 @@ const AreaCobranca = () => {
                         <Collapse in={collapseId === index}>
                           {locacoesCliente.map((locacao, locacaoIndex) => (
                             <Box key={locacaoIndex} pl={5}>
-                              <Tr cursor="pointer" _hover={{ bg: "gray.100" }}>
-                                <Td>{locacao.produto.productId}</Td>
+                              <Thead>
+                                <Tr>
+                                  <Th fontSize="13px">Plaqueta</Th>
+                                  <Th fontSize="13px">Tipo</Th>
+                                  <Th fontSize="13px">Tipo de Locação</Th>
+                                  <Th fontSize="13px">Valor</Th>
+                                </Tr>
+                              </Thead>
+                              <Tbody>
+                                <Td color="blue"><big><b>{locacao.produto.productId}</b></big></Td>
                                 <Td>{locacao.produto.type}</Td>
+                                <Td>{locacao.tipoLocacao}</Td>
+                                <Td>{locacao.valorPorcentagem}</Td>
+                                <Td>R$: {locacao.tipoLocacao === 'porcentagem' ? locacao.valorPorcentagem : locacao.valor}</Td>
                                 <Td>
                                   <Button colorScheme="yellow" onClick={() => [setLocacaoCobranca(locacao), onOpen()]}>
                                     Realizar Cobrança
                                   </Button>
                                 </Td>
-                              </Tr>
+                              </Tbody>
                             </Box>
                           ))}
                         </Collapse>
