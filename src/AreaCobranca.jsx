@@ -21,6 +21,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import ModalCobranca from "./components/ModalCobranca";
+import firebase from './firebase';
 
 const AreaCobranca = () => {
   // States
@@ -31,12 +32,13 @@ const AreaCobranca = () => {
   const [locacoes, setLocacoes] = useState([]);
   const [locacaoRealizarCobranca, setLocacaoCobranca] = useState(null);
 
-  // Load data from local storage
+  // Load data from Firebase
   useEffect(() => {
-    const db_locacoes = localStorage.getItem("locacoes")
-      ? JSON.parse(localStorage.getItem("locacoes"))
-      : [];
-    setLocacoes(db_locacoes);
+    const db = firebase.database();
+    db.ref('locacoes').on('value', (snapshot) => {
+      const data = snapshot.val();
+      setLocacoes(data || []);
+    });
   }, []);
 
   // Filtrar locações

@@ -14,6 +14,7 @@ import {
     Checkbox,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import firebase from './firebase';
 
 const ModalCobranca = ({ locacao, isOpen, onClose }) => {
     const [loc, setLocacao] = useState(locacao || null);
@@ -26,24 +27,15 @@ const ModalCobranca = ({ locacao, isOpen, onClose }) => {
     const handleSubmit = async () => {
         // Atualize o banco de dados com o novo valor recebido, saldo devedor, relogioAtual e loc.product.counter
         try {
-            const response = await fetch('/api/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: loc.id,
-                    valorRecebido,
-                    saldoDevedor,
-                    relogio: relogioAtual,
-                    counter: relogioAtual, // atualiza o counter com o valor de relogioAtual
-                }),
+            // Save data to Firebase
+            const db = firebase.database();
+            await db.ref(`cobranca/${loc.id}`).set({
+                valorRecebido,
+                saldoDevedor,
+                relogio: relogioAtual,
+                counter: relogioAtual, // atualiza o counter com o valor de relogioAtual
             });
-    
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-    
+
             // Atualize o estado local com os novos valores
             setLocacao({
                 ...loc,

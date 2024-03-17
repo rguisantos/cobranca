@@ -15,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ModalComp from "./components/ModalComp";
+import firebase from './firebase';
 
 const cadastroClientes = () => {
   const {isOpen, onOpen, onClose} = useDisclosure();
@@ -28,19 +29,21 @@ const cadastroClientes = () => {
   });
 
   useEffect(() => {
-    const db_costumer = localStorage.getItem("cad_cliente")
-    ? JSON.parse(localStorage.getItem("cad_cliente"))
-    : [];
-
-    setData(db_costumer);
+    const db = firebase.database();
+    db.ref('cad_cliente').on('value', (snapshot) => {
+      const data = snapshot.val();
+      setData(data || []);
+    });
   }, [setData]);
 
-  const handleRemove = (cpf) => {
+  const handleRemove = async (cpf) => {
     const newArray = data.filter((item) => item.cpf !== cpf);
 
     setData(newArray);
 
-    localStorage.setItem("cad_cliente", JSON.stringify(newArray));
+    // Update Firebase
+    const db = firebase.database();
+    await db.ref('cad_cliente').set(newArray);
   };
 
   return (

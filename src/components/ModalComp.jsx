@@ -13,6 +13,7 @@ import {
     Box,
 } from "@chakra-ui/react";
 import { useState } from "react";
+import firebase from './firebase';
 
 const ModalComp = ({data, setData, dataEdit, isOpen, onClose}) => {
     const [name, setName] = useState(dataEdit.name ||"");
@@ -24,7 +25,7 @@ const ModalComp = ({data, setData, dataEdit, isOpen, onClose}) => {
     const [city, setCity] = useState(dataEdit.city ||"");
     const [state, setState] = useState(dataEdit.state ||"");
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!name || !cpf || !rg || !phone || !address || !neighborhood || !city || !state) return;
 
         if (cpfAlreadyExists()) {
@@ -37,7 +38,10 @@ const ModalComp = ({data, setData, dataEdit, isOpen, onClose}) => {
         ? [...(data ? data : []), { name, cpf, rg, phone, address, neighborhood, city, state }]
         : [...(data ? data : [])];
 
-        localStorage.setItem("cad_cliente", JSON.stringify(newDataArray));
+        // Save data to Firebase
+        const db = firebase.database();
+        await db.ref('cad_cliente').set(newDataArray);
+
         setData(newDataArray);
         onClose();
     };

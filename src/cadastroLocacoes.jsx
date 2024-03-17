@@ -1,6 +1,7 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Button } from "@chakra-ui/react";
 import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
+import firebase from './firebase';
 
 const CadastroLocacoes = () => {
     // States
@@ -14,26 +15,25 @@ const CadastroLocacoes = () => {
     const [valorFicha, setValorFicha] = useState(null);
     const [clienteLocacoesVisivel, setClienteLocacoesVisivel] = useState(null);
     const [valorPorcentagem, setvalorPorcentagem] = useState(null);
-    // Load data from local storage
+    // Load data from Firebase
     useEffect(() => {
-        const db_clientes = localStorage.getItem("cad_cliente")
-            ? JSON.parse(localStorage.getItem("cad_cliente"))
-            : [];
-        setClientes(db_clientes);
-
-        const db_produtos = localStorage.getItem("cad_produto")
-            ? JSON.parse(localStorage.getItem("cad_produto"))
-            : [];
-        setProdutos(db_produtos);
-
-        const db_locacoes = localStorage.getItem("locacoes")
-            ? JSON.parse(localStorage.getItem("locacoes"))
-            : [];
-        setLocacoes(db_locacoes);
+        const db = firebase.database();
+        db.ref('cad_cliente').on('value', (snapshot) => {
+            const data = snapshot.val();
+            setClientes(data || []);
+        });
+        db.ref('cad_produto').on('value', (snapshot) => {
+            const data = snapshot.val();
+            setProdutos(data || []);
+        });
+        db.ref('locacoes').on('value', (snapshot) => {
+            const data = snapshot.val();
+            setLocacoes(data || []);
+        });
     }, []);
 
     // Handle form submission
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
         const cliente = clientes.find(cliente => cliente.cpf === clienteSelecionado.value);
@@ -55,7 +55,10 @@ const CadastroLocacoes = () => {
 
         const updatedLocacoes = [...locacoes, novaLocacao];
         setLocacoes(updatedLocacoes);
-        localStorage.setItem("locacoes", JSON.stringify(updatedLocacoes));
+
+        // Update Firebase
+        const db = firebase.database();
+        await db.ref('locacoes').set(updatedLocacoes);
 
         setClienteSelecionado(null);
         setProdutoSelecionado(null);
@@ -66,10 +69,13 @@ const CadastroLocacoes = () => {
     };
 
     // Handle product deregistration
-    const handleDescadastrar = (produtoId) => {
+    const handleDescadastrar = async (produtoId) => {
         const updatedLocacoes = locacoes.filter(locacao => locacao.produto.productId !== produtoId);
         setLocacoes(updatedLocacoes);
-        localStorage.setItem("locacoes", JSON.stringify(updatedLocacoes));
+
+        // Update Firebase
+        const db = firebase.database();
+        await db.ref('locacoes').set(updatedLocacoes);
 
         const updatedProdutos = produtos.map(produto => {
             if (produto.productId === produtoId) {
@@ -79,7 +85,7 @@ const CadastroLocacoes = () => {
             }
         });
         setProdutos(updatedProdutos);
-        localStorage.setItem("produtos", JSON.stringify(updatedProdutos));
+        await db.ref('produtos').set(updatedProdutos);
     };
 
     // Handle client click

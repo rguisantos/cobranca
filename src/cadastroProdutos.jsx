@@ -1,6 +1,7 @@
 import { Flex, Box, Button, Table, Thead, Tr, Th, Td, Tbody, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay, Input } from "@chakra-ui/react";
 import React, { useState, useEffect, useRef } from 'react';
 import ProductModal from './ProductModal';
+import firebase from './firebase';
 
 function cadastroProdutos() {
   const [products, setProducts] = useState([]);
@@ -12,10 +13,11 @@ function cadastroProdutos() {
   const cancelRef = useRef();
 
   useEffect(() => {
-    const storedProducts = localStorage.getItem('cad_produto');
-    if (storedProducts) {
-      setProducts(JSON.parse(storedProducts));
-    }
+    const db = firebase.database();
+    db.ref('cad_produto').on('value', (snapshot) => {
+      const data = snapshot.val();
+      setProducts(data || []);
+    });
   }, []);
 
   const handleEditProduct = (product, index) => {
@@ -28,10 +30,15 @@ function cadastroProdutos() {
     setProductModalOpen(true);
   };
 
-  const handleDeleteProduct = () => {
-    setProducts(products.filter((_, index) => index !== deleteProductIndex));
+  const handleDeleteProduct = async () => {
+    const newProducts = products.filter((_, index) => index !== deleteProductIndex);
+    setProducts(newProducts);
     setDeleteProductIndex(null);
     setDeleteDialogOpen(false);
+
+    // Update Firebase
+    const db = firebase.database();
+    await db.ref('cad_produto').set(newProducts);
   };
 
   const handleSearchChange = (event) => {
