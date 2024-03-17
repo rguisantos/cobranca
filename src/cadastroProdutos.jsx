@@ -50,7 +50,7 @@ function cadastroProdutos() {
       fontSize="13px"
       fontFamily="poppins"
     >
-      <Box maxW={1200} w="100%" h="100vh" py={10} px={2}>
+      <Box maxW={1200} w="100%" h="100vh" py={10} px={2} bg="gray.100" p={1} rounded="md">
         <Button colorScheme="blue" onClick={handleAddProduct}>
           Adicionar Produto
         </Button>
