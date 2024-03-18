@@ -15,12 +15,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ModalComp from "./ModalComp";
-import { db } from './firebase';
+import { db, getClientes } from './firebase';
 import { ref, onValue, set } from 'firebase/database';
 
 const cadastroClientes = () => {
   const {isOpen, onOpen, onClose} = useDisclosure();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState(getClientes(db));
   const [dataEdit, setDataEdit] = useState({});
   const [searchTerm, setSearchTerm] = useState(""); // New state for the search term
 

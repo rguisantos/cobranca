@@ -39,9 +39,10 @@ const ModalComp = ({data, setData, dataEdit = {}, isOpen, onClose}) => {
         ? [...(data ? data : []), { name, cpf, rg, phone, address, neighborhood, city, state }]
         : [...(data ? data : [])];
 
+        addCliente(db,data[dataEdit.index]);
         // Save data to Firebase
-        const cadClienteRef = ref(db, 'cad_cliente');
-        await set(cadClienteRef, newDataArray);
+        // const cadClienteRef = ref(db, 'cad_cliente');
+        // await set(cadClienteRef, newDataArray);
 
         setData(newDataArray);
         onClose();

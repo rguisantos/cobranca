@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getDatabase } from 'firebase/database';
+import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore/lite';
 
 const firebaseConfig = {
     apiKey: "AIzaSyB9I6exmk-TaCRsrZZcLBKMic2oBE5S51w",
@@ -14,6 +14,18 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const db = getFirestore(app);
 
-export { app, db };
+async function getClientes(db) {
+    const clientesCollection = collection(db, 'cad_cliente');
+    const clienteSnapshot = await getDocs(clientesCollection);
+    const clienteList = clienteSnapshot.docs.map(doc => doc.data());
+    return clienteList;
+}
+
+async function addCliente(db) {
+    const docRef = await addDoc(collection(db, "cad_cliente"),data);
+    return docRef;
+}
+
+export { app, db, getClientes, addCliente };
