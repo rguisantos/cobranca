@@ -15,14 +15,13 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import ModalComp from "./ModalComp";
-import { db, getClientes } from './firebase';
-import { ref, onValue, set } from 'firebase/database';
+import { ref, onValue, set, getDatabase } from 'firebase/database';
 
-const cadastroClientes = () => {
+const CadastroClientes = () => {
   const {isOpen, onOpen, onClose} = useDisclosure();
-  const [data, setData] = useState(getClientes(db));
+  const [data, setData] = useState([]);
   const [dataEdit, setDataEdit] = useState({});
-  const [searchTerm, setSearchTerm] = useState(""); // New state for the search term
+  const [searchTerm, setSearchTerm] = useState("");
 
   const isMobile = useBreakpointValue({
     base: true,
@@ -30,21 +29,22 @@ const cadastroClientes = () => {
   });
 
   useEffect(() => {
-    const cadClienteRef = ref(db, 'cad_cliente');
+    const cadClienteRef = ref(getDatabase(), 'cad_cliente');
     onValue(cadClienteRef, (snapshot) => {
       const data = snapshot.val();
-      setData(data || []);
+      // Convert object to array
+      const dataArray = data ? Object.keys(data).map(key => ({...data[key], id: key})) : [];
+      setData(dataArray);
     });
-  }, [setData]);
+  }, []);
 
   const handleRemove = async (cpf) => {
-    const newArray = data.filter((item) => item.cpf !== cpf);
-
-    setData(newArray);
-
-    // Update Firebase
-    const cadClienteRef = ref(db, 'cad_cliente');
-    await set(cadClienteRef, newArray);
+    if (Array.isArray(data)) {
+      const newArray = data.filter((item) => item.cpf !== cpf);
+      setData(newArray);
+      const cadClienteRef = ref(getDatabase(), 'cad_cliente');
+      await set(cadClienteRef, newArray);
+    }
   };
 
   return (
@@ -57,10 +57,10 @@ const cadastroClientes = () => {
       >
         <Box bg="gray.100" p={1} rounded="md">
           <TableContainer>
-          <Button m="1" colorScheme="green" onClick={() => [setDataEdit({}), onOpen()]}>
+          <Button m="1" colorScheme="green" onClick={() => {setDataEdit({}); onOpen();}}>
             Novo Cliente
           </Button>
-          <Input h="12" m="1" top="1" bg="gray.50" w="85%" // New input field for the search term
+          <Input h="12" m="1" bg="gray.50" w="85%"
             placeholder="Buscar cliente..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -82,12 +82,13 @@ const cadastroClientes = () => {
                 </Tr>
               </Thead>
               <Tbody bg="gray.50" p={2} rounded="md">
-                {data
-                  .filter((client) =>
-                    client.name.toLowerCase().includes(searchTerm.toLowerCase())
-                  )
-                  .map(({ name, cpf, rg, phone, address, neighborhood, city, state }, index) => (
-                  <Tr key={index} cursor="pointer" _hover={{ bg: "blue.100" }}>
+              {data
+  .filter((client) =>
+    client.name ? client.name.toLowerCase().includes(searchTerm.toLowerCase()) : false
+  )
+  .map(({ name, cpf, rg, phone, address, neighborhood, city, state }, index) => (
+  // ...
+<Tr key={index} cursor="pointer" _hover={{ bg: "blue.100" }}>
                     <Td>{name}</Td>
                     <Td>{cpf}</Td>
                     <Td>{rg}</Td>
@@ -97,7 +98,7 @@ const cadastroClientes = () => {
                     <Td>{city}</Td>
                     <Td>{state}</Td>
                     <Td p={1}>
-                      <Button colorScheme="yellow" onClick={() => [setDataEdit({ name, cpf, rg, phone, address, neighborhood, city, state, index }), onOpen()]}>
+                      <Button colorScheme="yellow" onClick={() => {setDataEdit({ name, cpf, rg, phone, address, neighborhood, city, state, index }); onOpen();}}>
                         Editar
                       </Button>
                     </Td>
@@ -123,4 +124,4 @@ const cadastroClientes = () => {
   );
 }
 
-export default cadastroClientes;
+export default CadastroClientes;

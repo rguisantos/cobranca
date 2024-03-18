@@ -26,25 +26,24 @@ const ModalComp = ({data, setData, dataEdit = {}, isOpen, onClose}) => {
     const [city, setCity] = useState(dataEdit.city ||"");
     const [state, setState] = useState(dataEdit.state ||"");
 
+    const addCliente = async (db, client) => {
+        const cadClienteRef = ref(db, 'cad_cliente');
+        await set(cadClienteRef, client);
+    };
+
     const handleSave = async () => {
         if (!name || !cpf || !rg || !phone || !address || !neighborhood || !city || !state) return;
-
-        if (cpfAlreadyExists()) {
-            return alert("CPF já cadastrado");
-        }
+    
+        const newClient = { name, cpf, rg, phone, address, neighborhood, city, state };
+    
         if (Object.keys(dataEdit).length) {
-            data[dataEdit.index] = { name, cpf, rg, phone, address, neighborhood, city, state };
+            data[dataEdit.index] = newClient;
+        } else {
+            data.push(newClient);
         }
-        const newDataArray = !Object.keys(dataEdit).length
-        ? [...(data ? data : []), { name, cpf, rg, phone, address, neighborhood, city, state }]
-        : [...(data ? data : [])];
-
-        addCliente(db,data[dataEdit.index]);
-        // Save data to Firebase
-        // const cadClienteRef = ref(db, 'cad_cliente');
-        // await set(cadClienteRef, newDataArray);
-
-        setData(newDataArray);
+    
+        addCliente(db, newClient);
+        setData([...data]);
         onClose();
     };
 
